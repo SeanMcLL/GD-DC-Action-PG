@@ -58,6 +58,8 @@ namespace GDDC
             set { m_MaxSlopeAngle = value; }
         }
 
+        public Vector2 Center => (Vector2)transform.position + m_Collider.offset;
+
         private void Awake()
         {
             //Get a reference to all required components
@@ -68,11 +70,11 @@ namespace GDDC
         private void Start()
         {
             //Set all necessary settings for the required components
-            //m_Rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            m_Rigidbody.bodyType = RigidbodyType2D.Kinematic;
             m_Rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
         }
 
-        private bool FindClosestHit(Vector2 origin, Vector2 direction, float distance, out RaycastHit2D closestHit)
+        public bool FindClosestHit(Vector2 origin, Vector2 direction, float distance, out RaycastHit2D closestHit)
         {
             Vector2 size = m_Collider.size - Vector2.one * m_SkinWidth;
             float angle = 0.0f;

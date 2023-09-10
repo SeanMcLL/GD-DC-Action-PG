@@ -10,10 +10,12 @@ namespace GDDC
     {
         private CharacterController2D m_Controller;
         private Rigidbody2D m_Rigidbody;
-        private Vector2 m_Velocity;
-        [SerializeField] private bool m_FacingDirection = true;
 
         private bool m_JumpLast;
+        
+        private bool m_FacingDirection = true;
+        private bool m_WallSliding = false;
+        private Vector2 m_Velocity;
 
         private float m_JumpVelocity => Mathf.Sqrt(Mathf.Abs(2 * m_JumpHeight * m_GravityScale * Physics2D.gravity.y));
 
@@ -30,7 +32,11 @@ namespace GDDC
         [SerializeField, Tooltip("How much letting go of the jump button affects gravity")] private float m_LowJumpMultiplier = 2.5f;
         [SerializeField, Tooltip("How high the player jumps when holding the jump button down all the way")] private float m_JumpHeight = 3.0f;
         [SerializeField, Tooltip("How much less the player can accelerate by when in the air"), Range(0.0f, 1.0f)] private float m_AerialDampening = 0.2f;
-        
+
+        [Header("Wall Jump Settings")]
+        [SerializeField, Tooltip("How fast the player falls while wall sliding (constant speed)")] private float m_WallSlideSpeed = 2.0f;
+        [SerializeField, Tooltip("How fast the player jumps")] private Vector2 m_WallJumpSpeed;
+
         private void Awake()
         {
             m_Controller = GetComponent<CharacterController2D>();
@@ -58,6 +64,8 @@ namespace GDDC
 
             if (m_Controller.IsGrounded)
             {
+                m_WallSliding = false;
+
                 if (m_Input.Gameplay.Jump && !m_JumpLast)
                     m_Velocity.y = m_JumpVelocity;
                 else
@@ -82,6 +90,31 @@ namespace GDDC
                     gravityScale *= m_FallMultiplier;
 
                 m_Velocity.y += Physics2D.gravity.y * gravityScale * deltaTime;
+
+                float castDirection = -1.0f + (2 * Convert.ToInt32(m_FacingDirection));
+                if (m_Controller.FindClosestHit(m_Controller.Center, Vector2.right * castDirection, m_Controller.SkinWidth, out RaycastHit2D hit))
+                {
+                    if (m_Velocity.y < 0.0f)
+                    {
+                        if (m_Input.Gameplay.Movement.x != 0.0f)
+                            m_WallSliding = Mathf.Sign(m_Input.Gameplay.Movement.x) == castDirection;
+                    }
+                }
+                else m_WallSliding = false;
+
+                if (m_WallSliding)
+                {
+                    m_Velocity.y = -m_WallSlideSpeed;
+
+                    if (m_Input.Gameplay.Jump && !m_JumpLast)
+                    {
+                        m_WallSliding = false;
+                        m_FacingDirection = !m_FacingDirection;
+
+                        m_Velocity.x = -m_WallJumpSpeed.x * castDirection;
+                        m_Velocity.y = m_WallJumpSpeed.y;
+                    }
+                }
             }
 
             m_Controller.Move(m_Velocity * deltaTime);
