@@ -78,6 +78,8 @@ namespace GDDC
 
                 if (m_Velocity.x != 0.0f)
                     m_FacingDirection = Mathf.Sign(m_Velocity.x) == 1;
+                else if (m_Input.Gameplay.Movement.x != 0.0f)
+                    m_FacingDirection = Mathf.Sign(m_Input.Gameplay.Movement.x) == 1;
             }
             else
             {
@@ -91,21 +93,29 @@ namespace GDDC
 
                 m_Velocity.y += Physics2D.gravity.y * gravityScale * deltaTime;
 
+                bool canWallJump = false;
+
                 float castDirection = -1.0f + (2 * Convert.ToInt32(m_FacingDirection));
                 if (m_Controller.FindClosestHit(m_Controller.Center, Vector2.right * castDirection, m_Controller.SkinWidth, out RaycastHit2D hit))
                 {
-                    if (m_Velocity.y < 0.0f)
+                    if (m_Input.Gameplay.Movement.x != 0.0f)
                     {
-                        if (m_Input.Gameplay.Movement.x != 0.0f)
-                            m_WallSliding = Mathf.Sign(m_Input.Gameplay.Movement.x) == castDirection;
+                        canWallJump = Mathf.Sign(m_Input.Gameplay.Movement.x) == castDirection;
+
+                        if (m_Velocity.y < 0.0f)
+                            m_WallSliding = canWallJump;
                     }
                 }
                 else m_WallSliding = false;
 
                 if (m_WallSliding)
                 {
+                    m_Velocity.x = 0.0f;
                     m_Velocity.y = -m_WallSlideSpeed;
+                }
 
+                if (canWallJump)
+                {
                     if (m_Input.Gameplay.Jump && !m_JumpLast)
                     {
                         m_WallSliding = false;
