@@ -40,6 +40,24 @@ namespace GDDC
 
         public Vector2 Velocity { get; private set; }
 
+        public float SkinWidth
+        {
+            get { return m_SkinWidth; }
+            set { m_SkinWidth = value; }
+        }
+
+        public LayerMask GroundLayer
+        {
+            get { return m_GroundLayer; }
+            set { m_GroundLayer = value; }
+        }
+
+        public float MaxSlopeAngle
+        {
+            get { return m_MaxSlopeAngle; }
+            set { m_MaxSlopeAngle = value; }
+        }
+
         private void Awake()
         {
             //Get a reference to all required components

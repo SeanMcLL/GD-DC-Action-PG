@@ -9,7 +9,9 @@ namespace GDDC
     public class PlayerMovement : MonoBehaviour
     {
         private CharacterController2D m_Controller;
+        private Rigidbody2D m_Rigidbody;
         private Vector2 m_Velocity;
+        [SerializeField] private bool m_FacingDirection = true;
 
         private bool m_JumpLast;
 
@@ -21,25 +23,24 @@ namespace GDDC
         [SerializeField, Tooltip("The maximum walking speed of the player")] private float m_MaxSpeed;
         [SerializeField, Tooltip("How much the player accelerates to the target speed")] private AnimationCurve m_AccelerationCurve;
         [SerializeField, Tooltip("The maximum acceleration")] private float m_MaxAcceleration;
-        [SerializeField, Tooltip("A constant amount to decelerate by each frame when the target speed is 0")] private float m_Deceleration;
 
         [Header("Aerial Control Settings")]
         [SerializeField, Tooltip("How much gravity affects the player")] private float m_GravityScale = 1.0f;
         [SerializeField, Tooltip("How much extra gravity affects the player when falling")] private float m_FallMultiplier = 4.5f;
         [SerializeField, Tooltip("How much letting go of the jump button affects gravity")] private float m_LowJumpMultiplier = 2.5f;
         [SerializeField, Tooltip("How high the player jumps when holding the jump button down all the way")] private float m_JumpHeight = 3.0f;
-
+        [SerializeField, Tooltip("How much less the player can accelerate by when in the air"), Range(0.0f, 1.0f)] private float m_AerialDampening = 0.2f;
+        
         private void Awake()
         {
             m_Controller = GetComponent<CharacterController2D>();
+            m_Rigidbody = GetComponent<Rigidbody2D>();
             m_JumpLast = m_Input.Gameplay.Jump;
         }
 
         private void FixedUpdate()
         {
             float deltaTime = Time.fixedDeltaTime * Time.timeScale;
-
-            Debug.Log($"{deltaTime} - {Time.unscaledDeltaTime}");
 
             float currentSpeed = m_Velocity.x;
             float targetSpeed = m_MaxSpeed * m_Input.Gameplay.Movement.x;
@@ -48,6 +49,9 @@ namespace GDDC
             {
                 float currentT = Mathf.InverseLerp(0, Mathf.Abs(targetSpeed), Mathf.Abs(currentSpeed));
                 float targetAcceleration = Mathf.Lerp(-m_MaxAcceleration, m_MaxAcceleration, m_AccelerationCurve.Evaluate(currentT));
+
+                if (!m_Controller.IsGrounded)
+                    targetAcceleration *= m_AerialDampening;
 
                 m_Velocity.x = Mathf.MoveTowards(currentSpeed, targetSpeed, targetAcceleration * deltaTime);
             }
@@ -63,6 +67,9 @@ namespace GDDC
                     Vector2 perpendicular = m_Velocity - projection;
                     m_Velocity = perpendicular.normalized * m_Velocity.magnitude / m_Controller.LastGroundedHit.normal.y;
                 }
+
+                if (m_Velocity.x != 0.0f)
+                    m_FacingDirection = Mathf.Sign(m_Velocity.x) == 1;
             }
             else
             {
@@ -80,8 +87,6 @@ namespace GDDC
             m_Controller.Move(m_Velocity * deltaTime);
 
             m_JumpLast = m_Input.Gameplay.Jump;
-
-            Time.timeScale = Mathf.Lerp(0.5f, 1.0f, Convert.ToSingle(!m_Input.Gameplay.Attack));
         }
     }
 }
