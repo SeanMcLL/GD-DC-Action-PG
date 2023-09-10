@@ -33,7 +33,7 @@ namespace GDDC
                     ""name"": ""Movement"",
                     ""type"": ""Value"",
                     ""id"": ""ab6455ee-0cd8-40b2-96f6-26d226e5114d"",
-                    ""expectedControlType"": ""Dpad"",
+                    ""expectedControlType"": ""Stick"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -135,6 +135,17 @@ namespace GDDC
                     ""name"": """",
                     ""id"": ""fc9cce8e-9941-4705-bebf-86311499d441"",
                     ""path"": ""<Gamepad>/dpad"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b38ac849-a8d8-4623-9154-d9ab6556948d"",
+                    ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Controller"",
