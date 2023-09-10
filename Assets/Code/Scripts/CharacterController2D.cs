@@ -50,7 +50,7 @@ namespace GDDC
         private void Start()
         {
             //Set all necessary settings for the required components
-            m_Rigidbody.bodyType = RigidbodyType2D.Kinematic;
+            //m_Rigidbody.bodyType = RigidbodyType2D.Kinematic;
             m_Rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
         }
 

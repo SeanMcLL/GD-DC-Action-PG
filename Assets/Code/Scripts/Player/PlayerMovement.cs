@@ -39,7 +39,7 @@ namespace GDDC
         {
             float deltaTime = Time.fixedDeltaTime * Time.timeScale;
 
-            Debug.Log($"{deltaTime} - {Time.unscaledDeltaTime}");
+            //Debug.Log($"{deltaTime} - {Time.unscaledDeltaTime}");
 
             float currentSpeed = m_Velocity.x;
             float targetSpeed = m_MaxSpeed * m_Input.Gameplay.Movement.x;
